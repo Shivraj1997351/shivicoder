@@ -1,0 +1,24 @@
+{% extends 'base.html' %} {% block title %} Edit a blog {% endblock title %} {% block body %}
+
+<div class="container mt-5">
+    <div class="jumbotron my-3">
+        <form action="" method="post">{% csrf_token %}
+            <div class="form-group">
+                <input type="text" class="form-control" name="title" value="{{title}}" required>
+            </div>
+
+            <div class="form-group">
+                <textarea style="height:700px;border:1px solid #ccc;font:16px/26px Georgia, Garamond, Serif;overflow:auto;" class="form-control" name="blog" id="editblogcontent" required>{{content}}</textarea>
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control" name="slug" id="slug" value="{{slug}}" required>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-success">Update</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+{% endblock %}

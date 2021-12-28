@@ -1,0 +1,12 @@
+{% extends 'base.html' %} {% block title %}Profile pic{% endblock title %} {% block body %}
+<div class="container mt-5">
+    <div class="text-center py-5 bg-secondary text-white">
+        <h1 class="mb-3">Profile pic</h1>
+        <form action="" method="POST" enctype="multipart/form-data">{% csrf_token %}
+            <input type="hidden" name="user" value="{{request.user}}"> {{form}}
+            <input type="submit" class="btn btn-danger" value="Upload pic">
+        </form>
+    </div>
+</div>
+
+{% endblock %}

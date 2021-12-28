@@ -1,0 +1,105 @@
+{% extends 'base.html' %}{% load static %} {% block title %} Profile{% endblock title %} {% block body %}
+<style>
+    .avatar {
+        vertical-align: middle;
+        margin: auto;
+        width: 170px;
+        height: 170px;
+        border-radius: 50%;
+        margin-top: 5px;
+    }
+    
+    .centerpro {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 70%;
+    }
+</style>
+<div class="container mt-5">
+    <div class="card" id="card" style="background-color: greenyellow;">
+        {% if img %}
+        <img src="{{img.photo.url}}" class="avatar" alt="">
+        <a href="profile/profilepic/delete/{{request.user}}" class="btn btn-danger btn-sm mt-2" style="margin:auto;">Delete pic</a>
+        <a href="profile/profilepic/edit/{{request.user}}" class="btn btn-warning btn-sm mt-2" style="margin:auto;">Update pic</a> {% endif %}
+        <div class="card-body">
+            <h5 class="card-title">Username: <span style='color:red;'>{{request.user|safe}}</span></h5><br>
+            <h5 class="card-subtitle mb-2 text-muted">First name: <span style='color:salmon;'>{{request.user.first_name|safe}}</span></h5><br>
+            <h5 class="card-subtitle mb-2 text-muted">Last name: <span style='color: salmon;'>{{request.user.last_name|safe}}</span></h5><br>
+            <h5 class="card-subtitle mb-2 text-muted">Email: <span style='color:violet;'>{{request.user.email}}</span></h5><br>
+            <h5 class="card-subtitle mb-2 text-muted">Bio: <span style='color:chocolate;'>{{bio|safe}}</span></h5><br>
+            <a href="profile/edit/{{request.user}}" class="btn btn-info btn-sm" style="margin:auto;">Edit Profile</a> {% if not img %}
+            <a href="profile/profilepic/{{request.user}}" class="btn btn-success btn btn-sm" style="margin:auto;">Upload pic</a><br><br>{% endif %}
+            <a href="profile/editbio" class="btn btn-warning btn-sm" style="margin:auto;">Update Bio</a>
+        </div>
+        <div class="card-footer">
+            <form action="" method="GET" id="form">
+                {% if private_value == 'make public' %}
+                <button type="submit" class="btn btn-danger" id="followvalue">make public</button> {% else %}
+                <button type="submit" class="btn btn-danger" id="followvalue">make private</button> {% endif %}
+            </form><br>
+            <span><a href="profile/followers/{{request.user}}" style="text-decoration: none;">{{user_followers}} followers</a></span>
+            <span class="px-3"><a href="profile/followings/{{request.user}}" style="text-decoration: none;">{{user_following}} following</a></span>
+        </div>
+    </div>
+
+    {% if posts %}
+    <div class="container mt-5 mb-5">
+        {% for post in posts %}
+        <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 my-4 position-relative" style="background-color: violet;">
+            <div class="col p-4 d-flex flex-column position-static">
+                <h3 class="mb-3">
+                    Title: <span style="color: red;">{{post.title|safe}}</span>
+                </h3><br>
+                <div class="mb-2 text-muted">Posted on: <span style="color: seagreen;">{{post.timeStamp}}</span></div>
+                <p class="mb-2 text-muted">Description:</p> <span>{{post.slug|safe}}</span>
+                <!--<p class="card-text mb-auto">{{post.content|safe| truncatechars:200}}</p>-->
+                <div class="my-2">
+                    <a href="/blog/view/{{post.sno}}" role="button" class="btn btn-primary">Continue reading</a>
+                </div>
+                <div class="inlin-flex">
+                    <a href="/blog/view/edit/{{post.sno}}" class="btn btn-success btn-sm">Edit</a>
+                    <a href="#" class="btn btn-danger btn-sm remove-blog" pid={{post.sno}}>Delete</a>
+                </div>
+            </div>
+            <div class="col-auto d-none d-lg-block">
+                <object data="{% static 'home/img/thumbnail.jpg' %}" width="200" height="250"> </object>
+            </div>
+        </div><br><br> {% endfor %}
+    </div>
+    {% endif %}
+</div>
+<script>
+    $('.remove-blog').click(function(e) {
+        e.preventDefault();
+        var post_id = $(this).attr("pid").toString();
+        var eml = this
+        $.ajax({
+            type: "GET",
+            url: "/blog/view/delete",
+            data: {
+                post_id: post_id
+            },
+            success: function(data) {
+                eml.parentNode.parentNode.parentNode.remove()
+            }
+        })
+    })
+
+    $('#form').submit(function(e) {
+        e.preventDefault();
+        var value = $('#followvalue').text();
+
+        $.ajax({
+            type: "GET",
+            url: '/privacy',
+            data: {
+                value: value
+            },
+            success: function(data) {
+                $('#followvalue').html(data.fmsg);
+            }
+        })
+    })
+</script>
+{% endblock %}

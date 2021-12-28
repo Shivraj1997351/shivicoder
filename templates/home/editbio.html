@@ -1,0 +1,15 @@
+{% extends 'base.html' %} {% block title %}Update Bio{% endblock title %} {% block body %}
+<div class="container mt-5">
+    <div class="text-center py-5 bg-secondary text-white">
+        <h1 class="mb-3">Profile Bio</h1>
+        <form action="" method="POST">{% csrf_token %}
+            <div class="form-group">
+                <textarea style="height:300px;border:1px solid #ccc;font:16px/26px Georgia, Garamond, Serif;overflow:auto;" class="form-control" name="bio" placeholder="write your bio" id="bio">{{bio|safe}}</textarea>
+            </div>
+            <input type="submit" class="btn btn-danger" value="Update bio">
+        </form>
+    </div>
+</div>
+
+
+{% endblock %}

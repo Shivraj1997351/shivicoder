@@ -1,0 +1,68 @@
+user  = FollowersCount.objects.filter(follower=request.user)
+    
+    userlen = len(user)
+    allPost = []
+    for i in user:
+     j = Post.objects.filter(author=i).order_by('-timeStamp')
+     for k in j:
+         allPost.append(k)
+    
+    liked = Post.objects.filter(likes=request.user)
+    likedcount = len(liked)
+    likedpost = []
+    for i in liked:
+     likedpost.append(i.author)
+    flikedpost = []
+    for i in likedpost:
+        if i not in flikedpost:
+            flikedpost.append(i)
+    
+    
+    if userlen == 0:
+        if request.COOKIES.get('postid'):
+            postid = request.COOKIES.get('postid')
+            post3 = Post.objects.get(sno=postid)
+            post4 = Post.objects.filter(author=post3.author).order_by('-timeStamp')
+            post7 = list(post4)
+            post5 = Post.objects.all()
+            result = list(post7)
+            result.extend(y for y in post5 if y not in result)
+            if likedcount == 0:
+                context = {'allPosts': result} 
+            else:
+                lposts = []
+                for i in flikedpost:
+                 j = Post.objects.filter(author=i)
+                 for k in j:
+                     lposts.append(k)
+                lposts.extend(y for y in result if y not in lposts)
+                context = {'lposts':lposts}
+        else:
+            post5 = Post.objects.all().order_by('-timeStamp')[:15]
+            context = {'allPosts': post5}
+              
+                
+    else:
+        if request.COOKIES.get('postid'):
+            postid = request.COOKIES.get('postid')
+            post3 = Post.objects.get(sno=postid)
+            post4 = Post.objects.filter(author=post3.author).order_by('-timeStamp')
+            post6 = list(post4)
+            result = list(allPost)
+            result.extend(y for y in post6 if y not in result)
+            if likedcount == 0:
+                context = {'allPosts': result} 
+            else:
+                lposts = []
+                for i in flikedpost:
+                 j = Post.objects.filter(author=i)
+                 for k in j:
+                     lposts.append(k)
+                lposts.extend(y for y in result if y not in lposts)
+                context = {'lposts':lposts}
+        else:
+            post5 = Post.objects.all().order_by('-timeStamp')[:15]
+            post8 = list(post5)
+            result = list(allPost)
+            result.extend(y for y in post8 if y not in result)
+            context = {'allPosts': result}

@@ -1,0 +1,122 @@
+{% extends 'base.html' %}{% load static %} {% block title %} {{person.username}} {% endblock title %}{% block body %}
+<style>
+    .avatar {
+        vertical-align: middle;
+        margin: auto;
+        width: 170px;
+        height: 170px;
+        border-radius: 50%;
+        margin-top: 5px;
+    }
+</style>
+<div class="container mt-5 mb-5">
+    <div class="card" id="card" style="background-color: greenyellow;">
+        {% if img %}
+        <img src="{{img.photo.url}}" class="avatar">{% endif %}
+        <div class="card-body">
+            <h5 class="card-title">Username: <span style='color:red;'>{{person.username|safe}}</span></h5><br>
+            <h5 class="card-subtitle mb-2 text-muted">Name: <span style='color:blue;'>{{person.first_name|safe}}</span><span style='color:blue;margin-left: 5px;'>{{p.last_name}}</span></h5><br>
+            <h5 class="card-subtitle mb-2 text-muted">Email: <span style='color:violet;'>{{person.email}}</span></h5><br>
+            <h5 class="card-subtitle mb-2 text-muted">Bio: <span style="color: chocolate;">{{bio|safe}}</span></h5>
+        </div>
+        <div class="card-footer">
+            <form action="" method="GET" id="form">
+                <input type="hidden" id="user" value="{{person.username}}">
+                <input type="hidden" id="follower" value="{{request.user.username}}"> {% if follow_button_value == 'follow' %}
+                <button type="submit" class="btn btn-primary" id="followvalue">Follow</button> {% else %}
+                <button type="submit" class="btn btn-primary" id="followvalue">UnFollow</button> {% endif %}
+            </form><br>
+            <span><a href="followers/{{person.username}}" style="text-decoration: none;"><span id="followercount">{{user_followers}}</span> followers</a>
+            </span>
+            <span class="px-3"><a href="followings/{{person.username}}" style="text-decoration: none;"><span id="followingcount">{{user_following}}</span> following</a>
+            </span>
+        </div>
+    </div>
+</div>
+{% if private_value %} {% ifequal access_profile_value 'true' %} {% if posts %}
+<div class="container mt-5 mb-5">
+    {% for post in posts %}
+    <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 my-4 position-relative" style="background-color: violet;">
+        <div class="col p-4 d-flex flex-column position-static">
+            <h3 class="mb-3">
+                Title: <span style="color: red;">{{post.title|safe}}</span>
+            </h3><br>
+            <div class="mb-2 text-muted">Posted on: <span style="color: seagreen;">{{post.timeStamp}}</span></div>
+            <p class="mb-2 text-muted">Description:</p> <span>{{post.slug|safe}}</span>
+            <!--<p class="card-text mb-auto">{{post.content|safe| truncatechars:200}}</p>-->
+            <div class="my-2">
+                <a href="/blog/view/{{post.sno}}" role="button" class="btn btn-primary">Continue reading</a>
+            </div>
+        </div>
+        <div class="col-auto d-none d-lg-block">
+            <object data="{% static 'home/img/thumbnail.jpg' %}" width="200" height="250"> </object>
+        </div>
+    </div><br><br> {% endfor %} {% else %}
+    <h3 class="text-center mt-5">No blogs</h3>
+</div>
+{% endif %} {% else %}
+<h3 class="text-center mt-5" style="color: crimson;">Profile is private only followers can view</h3>
+{% endifequal %} {% else %} {% if posts %}
+<div class="container mt-5 mb-5">
+    {% for post in posts %}
+    <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 my-4 position-relative" style="background-color: violet;">
+        <div class="col p-4 d-flex flex-column position-static">
+            <h3 class="mb-3">
+                Title: <span style="color: red;">{{post.title|safe}}</span>
+            </h3><br>
+            <div class="mb-2 text-muted">Posted on: <span style="color: seagreen;">{{post.timeStamp}}</span></div>
+            <p class="mb-2 text-muted">Description:</p> <span>{{post.slug|safe}}</span>
+            <!--<p class="card-text mb-auto">{{post.content|safe| truncatechars:200}}</p>-->
+            <div class="my-2">
+                <a href="/blog/view/{{post.sno}}" role="button" class="btn btn-primary">Continue reading</a>
+            </div>
+        </div>
+        <div class="col-auto d-none d-lg-block">
+            <object data="{% static 'home/img/thumbnail.jpg' %}" width="200" height="250"> </object>
+        </div>
+    </div><br><br> {% endfor %} {% else %}
+    <h3 class="text-center mt-5">No blogs</h3>
+</div>
+{% endif %} {% endif %}
+<script>
+    $('#form').submit(function(e) {
+            e.preventDefault();
+            var user = $('#user').val();
+            var value = $('#followvalue').text();
+            var follower = $('#follower').val();
+
+            $.ajax({
+                type: "GET",
+                url: '/followers_count',
+                data: {
+                    user: user,
+                    follower: follower,
+                    value: value
+                },
+                success: function(data) {
+                    $('#followercount').html(data.fcount);
+                    $('#followingcount').html(data.fcount1);
+                    $('#followvalue').html(data.fmsg);
+                }
+            })
+        })
+        /*
+            $('#rform').submit(function(e) {
+                e.preventDefault();
+                var user = $('#user').val();
+                var value = $('#followvalue').text();
+
+                $.ajax({
+                    type: "GET",
+                    url: '/requestuser',
+                    data: {
+                        user: user,
+                        value: value
+                    },
+                    success: function(data) {
+                        $('#followvalue').html(data.fmsg);
+                    }
+                })
+            })*/
+</script>
+{% endblock %}

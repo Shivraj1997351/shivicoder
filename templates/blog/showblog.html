@@ -1,0 +1,137 @@
+{% extends 'base.html' %}{% load static %} {% block title %} View blog{% endblock title %} {% block body %} {% load humanize %} {% load extras %}
+<style>
+    .centerpro {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 70%;
+    }
+    
+    #like-count {
+        color: floralwhite;
+    }
+    
+    #comment-count {
+        color: floralwhite;
+    }
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<div class="container mt-5 mb-5">
+    {% if post %}
+    <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 my-4 position-relative jumbotron">
+        <div class="col p-4 d-flex flex-column position-static">
+            <strong class="d-inline-block mb-2 text-primary mb-3">Article  by <span style="color:red;">{{post.author|safe}}</span></strong>
+            <h3 class="mb-3">
+                Title: <span style="color: red;">{{post.title|safe}}</span>
+            </h3><br>
+            <div class="mb-2 text-muted">Posted on: <span style="color: seagreen;">{{post.timeStamp}}</span></div>
+            <p class="mb-2 text-muted">Description: {{post.slug|safe}}</p>
+            <div class="mt-5">{{post.content|safe}}</div>
+        </div>
+    </div>
+    <form action="/blog/like" method="GET" id="form" style="display: inline;">
+        <input type="hidden" name="value" value="{{post.sno}}"> {% if request.user not in post.likes.all %}
+        <button type="submit" class="btn btn-dark"><i id="likeicon"  class="far fa-heart"></i></button> {% else %}
+        <button type="submit" class="btn btn-dark"><i id="likeicon"  style="color:red;" class="fas fa-heart"></i></button> {% endif %}
+    </form>
+    <span id="like-count">{{post.likes.count}}</span>
+    <button style="margin-left:10px;" class="btn btn-dark">
+        <i class="far fa-comments"></i>
+    </button>
+    <span id="comment-count">{{totalcomments}}</span>{% endif %}
+</div>
+
+
+<div class="container mt-5" id="target">{% if post %}
+    <div class="my-2">
+        {% if user.is_authenticated %}
+        <form action="/blog/postCommentblog" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <!--<label for="exampleInputEmail1">Post Comment </label>-->
+                <input type="text" class="form-control" name="comment" placeholder="Enter comment here">
+            </div>
+            <input type="hidden" name="postSno" value="{{post.sno}}">
+            <input type="hidden" name="parentSno" value="">
+            <button type="submit" class="btn btn-primary btn-sm">Post</button>
+        </form>
+        {% else %} Please login to post a comment {% endif %}
+    </div>
+    {% if comments %} {% for comment in comments %}
+    <div class="row my-3">
+        <div class="col-sm-12">
+            <b><a href="/searchpeople/{{post.author}}" style="text-decoration: none;color:red;">{{comment.user.username}}</a></b> <span class="badge badge-secondary ">{{comment.timestamp| naturaltime}}</span>
+            <div class="my-2" style="color: chartreuse;">{{comment.comment}}</div>
+            <!--
+            <div class="reply mx-0">
+                {% if user.is_authenticated %}
+                <button class="btn btn-primary btn-sm" type="button" data-toggle="collapse" data-target="#replyBox{{comment.sno}}" aria-expanded="false" aria-controls="replyBox{{comment.sno}}">
+                    Reply
+                </button>
+                <div class="collapse" id="replyBox{{comment.sno}}">
+                    <div class="card card-body my-2">
+                        <form action="/blog/postCommentblog" method="post">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="comment">Post a reply </label>
+                                <input type="text" class="form-control" name="comment" placeholder="Enter comment here">
+                                <input type="hidden" name="parentSno" value="{{comment.sno}}">
+                            </div>
+                            <input type="hidden" name="postSno" value="{{post.sno}}">
+                            <button type="submit" class="btn btn-primary btn-sm">Post</button>
+                        </form>
+                    </div>
+                </div>
+                {% else %}
+                <button class="btn btn-sm btn-primary" type="button" data-toggle="collapse" data-target="#replyBox{{comment.sno}}" aria-expanded="false" aria-controls="replyBox{{comment.sno}}">
+                    Login to reply
+                </button> {% endif %}
+                
+                <div class="replies my-2 ">
+                    {% for reply in replyDict|get_val:comment.sno %}
+                    <div class="row my-2">
+                        <div class="col-sm-12">
+                            <div class="col-sm-12 ">
+                                <b> <a href="/searchpeople/{{post.author}}" style="text-decoration: none;color:red;">{{reply.user.username}}</a> </b> <span class="badge badge-secondary ">{{reply.timestamp| naturaltime}}</span>
+                                <div class="my-2">{{reply.comment}}</div>
+                            </div>
+                            
+                            {% if reply.comment %}
+                            <div class="col-sm-12">
+                                <button class="btn btn-primary btn-sm" type="button" data-toggle="collapse" data-target="#replyBox{{comment.sno}}" aria-expanded="false" aria-controls="replyBox{{comment.sno}}">
+                                Reply
+                            </button>
+                            </div>
+                            {% endif %}
+                            <br>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>-->
+        </div>
+    </div>
+    {% endfor %} {% endif %} {% else %}
+    <img src="{% static 'home/img/emptymessage.gif' %}" class="centerpro mt-5"> {% endif %}
+</div>
+<script>
+    $('#form').submit(function(e) {
+        e.preventDefault();
+        var form = $(this);
+        var url = form.attr('action');
+        $.ajax({
+            type: "GET",
+            url: url,
+            data: form.serialize(),
+            success: function(data) {
+                swal(data.message, {
+                    icon: "success"
+                })
+                $('#likeicon').attr('class', data.fmsg);
+                $('#likeicon').css('color', data.css);
+                $('#like-count').html(data.fcount);
+            }
+        })
+    })
+</script>
+
+{% endblock %}

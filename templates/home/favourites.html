@@ -1,0 +1,57 @@
+{% extends 'base.html' %}{% load static %} {% block title %} Favourites{% endblock title %} {% block body %}
+<style>
+    .centerpro {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 50%;
+    }
+    
+    .center {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 70%;
+    }
+</style>
+<div class="container mt-5 mb-5">{% if posts %} {% for post in posts %}{% if request.user in post.likes.all %}
+    <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 my-4 position-relative" style="background-color: violet;">
+        <div class="col p-4 d-flex flex-column position-static">
+            <h3 class="mb-3">
+                Title: <span style="color: red;">{{post.title|safe}}</span>
+            </h3><br>
+            <div class="mb-2 text-muted">Posted on: <span style="color: seagreen;">{{post.timeStamp}}</span></div>
+            <p class="mb-2 text-muted">Description:</p> <span>{{post.slug|safe}}</span>
+            <!--<p class="card-text mb-auto">{{post.content|safe| truncatechars:200}}</p>-->
+            <div class="my-2">
+                <a href="/blog/view/{{post.sno}}" role="button" class="btn btn-primary">Continue reading</a>
+            </div>
+            {% ifequal request.user.username post.author %}
+            <div class="inlin-flex">
+                <a href="/blog/view/edit/{{post.sno}}" class="btn btn-success btn-sm">Edit</a>
+                <a href="#" class="btn btn-danger btn-sm remove-blog" pid={{post.sno}}>Delete</a>
+            </div>{% endifequal %}
+        </div>
+        <div class="col-auto d-none d-lg-block">
+            <object data="{% static 'home/img/thumbnail.jpg' %}" width="200" height="250"> </object>
+        </div>
+    </div><br><br> {% endif %}{% endfor %} {% endif %}
+</div>
+<script>
+    $('.remove-blog').click(function(e) {
+        e.preventDefault();
+        var post_id = $(this).attr("pid").toString();
+        var eml = this
+        $.ajax({
+            type: "GET",
+            url: "/blog/view/delete",
+            data: {
+                post_id: post_id
+            },
+            success: function(data) {
+                eml.parentNode.parentNode.parentNode.remove()
+            }
+        })
+    })
+</script>
+{% endblock %}

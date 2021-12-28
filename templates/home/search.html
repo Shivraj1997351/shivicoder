@@ -1,0 +1,149 @@
+{% extends 'base.html' %}{% load static %} {% block title %} Search Results {% endblock title %} {% block blogactive %} active {% endblock blogactive %} {% block body %}
+<style>
+    .avatar {
+        vertical-align: middle;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    
+    .centerpro {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 50%;
+    }
+</style>
+
+<style>
+    .speech {
+        border: 1px solid #DDD;
+        width: 250px;
+        padding: 0;
+        margin-top: 15px;
+    }
+    
+    .speech input {
+        border: 0;
+        width: 190px;
+        display: inline-block;
+        height: 30px;
+    }
+    
+    .speech img {
+        float: right;
+        width: 30px;
+    }
+</style>
+
+<!-- HTML5 Speech Recognition API -->
+<script>
+    function startDictation() {
+
+        if (window.hasOwnProperty('webkitSpeechRecognition')) {
+
+            var recognition = new webkitSpeechRecognition();
+
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.lang = "en-US";
+            recognition.start();
+
+            recognition.onresult = function(e) {
+                document.getElementById('transcript').value = e.results[0][0].transcript;
+                recognition.stop();
+                document.getElementById('labnol').submit();
+            };
+
+            recognition.onerror = function(e) {
+                recognition.stop();
+            }
+
+        }
+    }
+</script>
+
+
+<div class="container mb-5">
+    <!-- Search Form -->
+    <form id="labnol" method="get" action="/search">
+        <div class="speech">
+            <input type="text" name="query" id="transcript" placeholder="search by voice..." />
+            <img onclick="startDictation()" src="//i.imgur.com/cHidSVu.gif" style="background-color: crimson;" />
+        </div>
+    </form>
+    {% if not users %} {% if not allPosts %}
+    <div class="jumbotron mt-5">
+        <p class="text-muted">No search results</p>
+        Your search query : <b>{{query}}</b> did not match any documents. <br> Suggestions:
+        <ul>
+            <li>Make sure that all words are spelled correctly.</li>
+            <li>Try more general keywords.</li>
+            <li> Try fewer keywords.</li>
+            <li> Try different keywords.</li>
+            </li>
+        </ul>
+    </div>
+
+    {% endif %} {% endif %} {% if allPosts %} {% for post in allPosts %}
+    <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 my-4 position-relative" style="background-color: violet;">
+        <div class="col p-4 d-flex flex-column position-static">
+            <strong class="d-inline-block mb-2 text-primary mb-3">Article  by <a style="text-decoration:none;color:red;" href="searchpeople/{{post.author}}">{{post.author|safe}}</a></strong>
+            <h3 class="mb-3">
+                Title: <span style="color: red;">{{post.title|safe}}</span>
+            </h3>
+            <div class="mb-2 text-muted">Posted on: <span style="color: seagreen;">{{post.timeStamp}}</span></div>
+            <p class="mb-2 text-muted">Description: </p><span>{{post.slug|safe}}</span>
+            <!--<p class="card-text mb-auto">{{post.content|safe|truncatechars:500}}</p>-->
+            <div class="my-2">
+                <a href="/blog/view/{{post.sno}}" role="button" class="btn btn-primary">Continue reading</a>
+            </div>
+            {% ifequal request.user.username post.author %}
+            <div class="inlin-flex">
+                <a href="/blog/view/edit/{{post.sno}}" class="btn btn-success btn-sm">Edit</a>
+                <a href="#" class="btn btn-danger btn-sm remove-blog" pid={{post.sno}}>Delete</a>
+            </div>{% endifequal %}
+        </div>
+        <div class="col-auto d-none d-lg-block">
+            <object data="{% static 'home/img/thumbnail.jpg' %}" width="200" height="250"> </object>
+        </div>
+    </div>
+
+    {% endfor %} {% endif %} {% if users %}
+    <hr>
+    <div class="row py-2">
+        {% for p in users %}
+        <div class="col-sm-4 mt-2">
+            <div class="card-body text-center">
+                {% if imgs %} {% for img in imgs %}
+                <a href="/searchpeople/{{p.username}}">{% ifnotequal img.user p.username %}
+                    <!-- continue -->{% else %}
+                    <img src="{{img.photo.url}}" class="avatar">
+                    {% endifnotequal %}
+                    </a>{% endfor %}{% endif %}
+                <a href="/searchpeople/{{p.username}}" style="text-decoration: none;">
+                    <h3 class="pt-2" style="color: yellow;">{{p.username|safe}}</h3>
+                </a>
+            </div>
+        </div><br><br> {% endfor %} {% endif %}
+    </div>
+    <script>
+        $('.remove-blog').click(function(e) {
+            e.preventDefault();
+            var post_id = $(this).attr("pid").toString();
+            var eml = this
+            $.ajax({
+                type: "GET",
+                url: "/blog/view/delete",
+                data: {
+                    post_id: post_id
+                },
+                success: function(data) {
+                    eml.parentNode.parentNode.parentNode.remove()
+                }
+            })
+        })
+    </script>
+    {% endblock %}

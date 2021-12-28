@@ -1,0 +1,38 @@
+{% extends 'base.html' %}{% load static %} {% block title %}Followings {% endblock title %}{% block body %}
+<style>
+    .avatar {
+        vertical-align: middle;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    
+    .centerpro {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 70%;
+    }
+</style>
+<div class="container mt-5 mb-5">
+    {% if user_followinglist %}
+    <div class="row py-2">
+        {% for p in user_followinglist %}
+        <div class="col-sm-4 mt-2">
+            <div class="card-body text-center">
+                {% if imgs %} {% for img in imgs %}
+                <a href="/searchpeople/{{p.user}}">{% ifnotequal img.user p.user %}
+                    <!-- continue -->{% else %}
+                    <img src="{{img.photo.url}}" class="avatar">
+                    {% endifnotequal %}
+                    </a>{% endfor %}{% endif %}
+                <a href="/searchpeople/{{p.user}}" style="text-decoration: none;">
+                    <h3 class="pt-2" style="color: yellow;">{{p.user|safe}}</h3>
+                </a>
+            </div>
+        </div><br><br> {% endfor %}
+    </div> {% else %}
+    <img src="{% static 'home/img/emptyfavourite.png' %}" class="centerpro mt-5"> {% endif %}
+</div>
+{% endblock %}

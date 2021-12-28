@@ -1,0 +1,37 @@
+{% extends 'base.html' %} {% block title %} Sign up{% endblock title %} {% block body %}
+<div class="container mt-5">
+    <div class="col-sm-12">
+        <form class="jumbotron shadow p-5" action="/signuppage" method="POST">{% csrf_token %}
+            <h3 class="text-center text-info">Signup</h3>
+            <div class="form-group ">
+                <label for="username ">Username</label>
+                <input type="text " class="form-control " id="username" name="username" placeholder="Choose a unique username " required>
+            </div>
+            <div class="form-group ">
+                <label for="fname ">First Name</label>
+                <input type="text " class="form-control " id="fname" name="fname" placeholder="Enter Your First Name " required>
+            </div>
+            <div class="form-group ">
+                <label for="lname ">Last Name</label>
+                <input type="text " class="form-control " id="lname" name="lname" placeholder="Enter Your Last Name " required>
+            </div>
+            <div class="form-group ">
+                <label for="email ">Email address</label>
+                <input type="email " class="form-control " id="email" name="email" placeholder="name@example.com " required>
+            </div>
+            <div class="form-group ">
+                <label for="pass1 ">Choose a password</label>
+                <input type="password" class="form-control " id="pass1" name="pass1" placeholder="Choose Your Password " required>
+            </div>
+            <div class="form-group ">
+                <label for="pass2 ">Confirm Password</label>
+                <input type="password" class="form-control " id="pass2" name="pass2" placeholder="Enter your password again " required>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-sm">Sign up</button>
+            </div>
+            <p><span style="color:blue;padding-left: 5px;">Already have an account?</span><a href="loginpage" style="text-decoration: none;color:tomato;margin-left: 5px;">Log in</a></p>
+        </form>
+    </div>
+</div>
+{% endblock %}

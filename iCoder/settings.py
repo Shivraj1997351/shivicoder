@@ -15,7 +15,7 @@ SWEETIFY_SWEETALERT_LIBRARY = 'sweetalert2'
 SECRET_KEY = 'django-insecure-ipj#-c3bo&j^b_qp@)c578qc!@ury20yvr0rou&$mvluuyw0h^'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['shivicoder.herokuapp.com']
 
